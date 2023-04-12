@@ -3,7 +3,9 @@ import re
 import requests
 from googletrans import Translator, constants
 import webbrowser
-
+import speech_recognition as sr
+import pyttsx3
+from user import User
 
 def extract_city_function(command: str):
     pattern = r"погода в ([\w\s]+)"
@@ -74,3 +76,55 @@ def search_function(a) -> str:  # type: ignore
         return "Открываю браузер"
     except:
         return "Не удалось открыть"
+    
+def youtube_function(a)->str:
+    sentence = ' '.join(a)
+    print(sentence)
+    url = "https://www.youtube.com/results?search_query=" + sentence
+    try:
+        webbrowser.get().open(url)
+        return "Открываю ютуб"
+    except:
+        return "Не удалось открыть"
+
+def settings_function(a)->str:
+    engine = pyttsx3.init()
+    engine.say("Скажите как вас зовут")
+    engine.runAndWait()
+    audio = recognize_speech()
+    name = audio_to_text(audio)
+
+    engine.say("Скажите какого вы пола")
+    engine.runAndWait()
+    audio = recognize_speech()
+    sex = audio_to_text(audio)
+
+    engine.say("Каким будет ваш основной язык")
+    engine.runAndWait()
+    audio = recognize_speech()
+    language = audio_to_text(audio)
+
+
+    engine.say("Каким будет ваш дополнительный язык")
+    engine.runAndWait()
+    audio = recognize_speech()
+    second_language = audio_to_text(audio)
+
+    user = User(name, sex, language, second_language)
+
+    engine.say("Пользователь успешно добавлен")
+    engine.runAndWait()
+
+def recognize_speech():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Говорите...")
+        audio = r.listen(source, phrase_time_limit=5)
+        return audio
+
+def audio_to_text(audio):
+    r = sr.Recognizer()
+    text = r.recognize_google(audio, language="ru-Ru")
+    return str(text)
+
+  
